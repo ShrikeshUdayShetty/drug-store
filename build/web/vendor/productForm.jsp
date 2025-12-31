@@ -94,7 +94,7 @@
                 <a href="<%= request.getContextPath() %>/vendor/products" class="btn btn-outline">Back to products</a>
             </header>
 
-            <form action="<%= formAction %>" method="post" enctype="multipart/form-data" class="grid" style="gap:2rem;">
+            <form action="<%= formAction %>" method="post" class="grid" style="gap:2rem;">
                 <% if (editing) { %>
                     <input type="hidden" name="medicineId" value="<%= medicine.getId() %>">
                 <% } %>
@@ -137,11 +137,6 @@
                         <div class="form-group">
                             <label for="imageUrl">Image URL</label>
                             <input type="text" id="imageUrl" name="imageUrl" placeholder="https://..." value="<%= editing && medicine.getImageUrl() != null ? medicine.getImageUrl() : "" %>">
-                        </div>
-                        <div class="form-group">
-                            <label for="imageFile">Upload image</label>
-                            <input type="file" id="imageFile" name="imageFile" accept="image/*">
-                            <p class="muted" style="margin-top:0.35rem;font-size:0.85rem;">Supported formats: jpg, png, webp, jpeg, gif.</p>
                         </div>
                     </div>
                 </section>

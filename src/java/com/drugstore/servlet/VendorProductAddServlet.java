@@ -3,23 +3,18 @@ package com.drugstore.servlet;
 import com.drugstore.dao.MedicineDao;
 import com.drugstore.model.Medicine;
 import com.drugstore.model.Vendor;
-import com.drugstore.util.UploadUtil;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.Locale;
 
 @WebServlet(name = "VendorProductAddServlet", urlPatterns = {"/vendor/products/add"})
-@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 20 * 1024 * 1024)
 public class VendorProductAddServlet extends HttpServlet {
 
     private final MedicineDao medicineDao = new MedicineDao();
@@ -95,15 +90,6 @@ public class VendorProductAddServlet extends HttpServlet {
             return;
         }
 
-        String uploadedImageUrl = null;
-        try {
-            uploadedImageUrl = UploadUtil.storeVendorProductImage(request, request.getPart("imageFile"));
-        } catch (IOException e) {
-            session.setAttribute("errorMessage", e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/vendor/products/add");
-            return;
-        }
-
         Medicine medicine = new Medicine();
         medicine.setVendorId(vendor.getId());
         medicine.setName(name.trim());
@@ -111,7 +97,7 @@ public class VendorProductAddServlet extends HttpServlet {
         medicine.setPricePerUnit(price);
         medicine.setStockQuantity(stock);
         medicine.setDiscountPercentage(discount);
-        medicine.setImageUrl(determineImagePath(imageUrl, uploadedImageUrl, null));
+        medicine.setImageUrl(determineImagePath(imageUrl, null));
         medicine.setManufacturingDate(manufacturingDate);
         medicine.setExpiryDate(expiryDate);
 
@@ -145,10 +131,7 @@ public class VendorProductAddServlet extends HttpServlet {
         return value == null || value.trim().isEmpty();
     }
 
-    private String determineImagePath(String imageUrl, String uploadedImageUrl, String fallback) {
-        if (uploadedImageUrl != null) {
-            return uploadedImageUrl;
-        }
+    private String determineImagePath(String imageUrl, String fallback) {
         if (!isBlank(imageUrl)) {
             return imageUrl.trim();
         }
