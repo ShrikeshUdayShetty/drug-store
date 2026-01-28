@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: drugstore-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: drugstore
+      MYSQL_ROOT_PASSWORD: changeme123
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pchangeme123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+  app:
+    build: .
+    container_name: drugstore-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: drugstore
+      DB_USER: root
+      DB_PASSWORD: skshetty
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
